@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Admin Feedback Dashboard</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+
+body{
+background: linear-gradient(135deg,#ff9a9e,#fad0c4,#a18cd1);
+font-family: Arial;
+}
+
+.dashboard{
+background:white;
+padding:30px;
+border-radius:15px;
+box-shadow:0 10px 25px rgba(0,0,0,0.2);
+}
+
+h2{
+text-align:center;
+color:#444;
+margin-bottom:20px;
+}
+
+.warning{
+background:#ffe0e0;
+padding:12px;
+border-radius:10px;
+margin-top:15px;
+font-weight:bold;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container mt-5">
+
+<div class="dashboard">
+
+<h2>Admin Feedback Dashboard</h2>
+
+<h4>Search Feedback</h4>
+
+<input type="text" id="searchBox" class="form-control mb-3"
+placeholder="Search by course or instructor"
+onkeyup="searchFeedback()">
+
+<select id="ratingFilter" class="form-control mb-3"
+onchange="filterRating()">
+
+<option value="">Filter by Rating</option>
+<option value="5">5 - Excellent</option>
+<option value="4">4 - Good</option>
+<option value="3">3 - Average</option>
+<option value="2">2 - Poor</option>
+<option value="1">1 - Very Poor</option>
+
+</select>
+
+<h4>Student Feedback</h4>
+
+<table class="table table-bordered" id="feedbackTable">
+
+<thead class="table-dark">
+
+<tr>
+
+<th>Course</th>
+<th>Instructor</th>
+<th>Rating</th>
+<th>Comment</th>
+<th>Anonymous</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+<tr>
+<td>AI</td>
+<td>Dr Kumar</td>
+<td>2</td>
+<td>Teaching speed very fast</td>
+<td>Yes</td>
+</tr>
+
+<tr>
+<td>Cloud Computing</td>
+<td>Dr Ravi</td>
+<td>5</td>
+<td>Very clear explanation</td>
+<td>No</td>
+</tr>
+
+<tr>
+<td>Data Science</td>
+<td>Dr Kumar</td>
+<td>2</td>
+<td>Too much theory</td>
+<td>Yes</td>
+</tr>
+
+<tr>
+<td>Java</td>
+<td>Dr Meena</td>
+<td>4</td>
+<td>Good practical examples</td>
+<td>No</td>
+</tr>
+
+</tbody>
+
+</table>
+
+<div class="warning">
+
+⚠ Instructor Warning:  
+Instructor <b>Dr Kumar</b> received multiple low ratings.
+
+</div>
+
+<hr>
+
+<div class="row">
+
+<div class="col-md-6">
+
+<h4>Rating Distribution</h4>
+
+<canvas id="pieChart"></canvas>
+
+</div>
+
+<div class="col-md-6">
+
+<h4>Course Performance</h4>
+
+<canvas id="barChart"></canvas>
+
+</div>
+
+</div>
+
+<hr>
+
+<h4>Most Common Feedback</h4>
+
+<ul class="list-group">
+
+<li class="list-group-item">Teaching speed very fast</li>
+<li class="list-group-item">Too much theory</li>
+<li class="list-group-item">Very clear explanation</li>
+
+</ul>
+
+</div>
+
+</div>
+
+<script>
+
+function searchFeedback(){
+
+let input=document.getElementById("searchBox").value.toLowerCase()
+
+let rows=document.querySelectorAll("#feedbackTable tbody tr")
+
+rows.forEach(row=>{
+
+let text=row.innerText.toLowerCase()
+
+row.style.display=text.includes(input) ? "" : "none"
+
+})
+
+}
+
+function filterRating(){
+
+let rating=document.getElementById("ratingFilter").value
+
+let rows=document.querySelectorAll("#feedbackTable tbody tr")
+
+rows.forEach(row=>{
+
+let cell=row.cells[2].innerText
+
+if(rating=="" || cell==rating)
+row.style.display=""
+else
+row.style.display="none"
+
+})
+
+}
+
+var pie=document.getElementById("pieChart")
+
+new Chart(pie,{
+type:"pie",
+data:{
+labels:["Excellent","Good","Average","Poor"],
+datasets:[{
+data:[8,6,3,4],
+backgroundColor:["green","blue","orange","red"]
+}]
+}
+})
+
+var bar=document.getElementById("barChart")
+
+new Chart(bar,{
+type:"bar",
+data:{
+labels:["AI","Cloud","Data Science","Java"],
+datasets:[{
+label:"Average Rating",
+data:[2,5,3,4],
+backgroundColor:["red","green","orange","blue"]
+}]
+}
+})
+
+</script>
+
+</body>
+</html>

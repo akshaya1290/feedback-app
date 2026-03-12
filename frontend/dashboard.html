@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Feedback System - Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="d-flex" style="min-height: 100vh;">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h5><i class="fas fa-graduation-cap"></i> Feedback System</h5>
+            </div>
+            <nav class="nav flex-column">
+                <a href="#student-dashboard" class="nav-link" data-page="student-dashboard">
+                    <i class="fas fa-user-graduate"></i> Student Dashboard
+                </a>
+                <a href="#feedback-form" class="nav-link" data-page="feedback-form">
+                    <i class="fas fa-edit"></i> Submit Feedback
+                </a>
+                <a href="#instructor-dashboard" class="nav-link instructor-only" data-page="instructor-dashboard" style="display:none;">
+                    <i class="fas fa-chalkboard-user"></i> My Notifications
+                </a>
+                <a href="#admin-dashboard" class="nav-link admin-only" data-page="admin-dashboard" style="display:none;">
+                    <i class="fas fa-tachometer-alt"></i> Admin Dashboard
+                </a>
+                <a href="#feedback-comparison" class="nav-link admin-only" data-page="feedback-comparison" style="display:none;">
+                    <i class="fas fa-chart-column"></i> Compare Feedback
+                </a>
+                <a href="#institution" class="nav-link admin-only" data-page="institution" style="display:none;">
+                    <i class="fas fa-building"></i> Institution Summary
+                </a>
+                <hr style="margin: 1rem 0;">
+                <a href="index.html" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </nav>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content flex-fill">
+            <!-- Header -->
+            <div class="header">
+                <h2 id="page-title">Student Dashboard</h2>
+                <div class="user-info">
+                    <i class="fas fa-user-circle"></i>
+                    <span id="username">Student</span>
+                    <span style="color: #999; margin-left: 15px; font-size: 0.85rem;">
+                        <span id="user-role-badge" style="background: #667eea; color: white; padding: 3px 10px; border-radius: 15px;">Student</span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+
+                <!-- Student Dashboard Page -->
+                <div id="student-dashboard" class="page-content active">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="stats-card">
+                                <div class="stats-icon"><i class="fas fa-star"></i></div>
+                                <div class="stats-content">
+                                    <h6>Average Rating</h6>
+                                    <p class="stats-value" id="avg-rating">4.5</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stats-card">
+                                <div class="stats-icon"><i class="fas fa-comments"></i></div>
+                                <div class="stats-content">
+                                    <h6>Total Feedback</h6>
+                                    <p class="stats-value" id="total-feedback">12</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="stats-card">
+                                <div class="stats-icon"><i class="fas fa-book"></i></div>
+                                <div class="stats-content">
+                                    <h6>Courses Rated</h6>
+                                    <p class="stats-value" id="courses-rated">5</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-4">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Your Recent Feedback</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="student-feedback-list">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feedback Form Page -->
+                <div id="feedback-form" class="page-content">
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">Submit Feedback</h5>
+                        </div>
+                        <div class="card-body">
+                            <form id="feedback-form-element">
+                                <div class="mb-3">
+                                    <label class="form-label">Select Course</label>
+                                    <select id="course-select" class="form-select" required>
+                                        <option value="">-- Choose a Course --</option>
+                                        <!-- Populated by JavaScript -->
+                                    </select>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Rating</label>
+                                    <div class="rating-selector">
+                                        <input type="radio" name="rating" value="1" id="rate1">
+                                        <label for="rate1"><i class="fas fa-star"></i></label>
+
+                                        <input type="radio" name="rating" value="2" id="rate2">
+                                        <label for="rate2"><i class="fas fa-star"></i></label>
+
+                                        <input type="radio" name="rating" value="3" id="rate3">
+                                        <label for="rate3"><i class="fas fa-star"></i></label>
+
+                                        <input type="radio" name="rating" value="4" id="rate4" checked>
+                                        <label for="rate4"><i class="fas fa-star"></i></label>
+
+                                        <input type="radio" name="rating" value="5" id="rate5">
+                                        <label for="rate5"><i class="fas fa-star"></i></label>
+
+                                        <span id="rating-text" class="ms-3">Good (4)</span>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label">Comment</label>
+                                    <textarea id="comment" class="form-control" rows="5" placeholder="Share your feedback..." required></textarea>
+                                </div>
+
+                                <div class="mb-3 form-check">
+                                    <input type="checkbox" id="anonymous" class="form-check-input">
+                                    <label class="form-check-label" for="anonymous">
+                                        <i class="fas fa-mask"></i> Submit as Anonymous
+                                    </label>
+                                </div>
+
+                                <button type="submit" class="btn btn-success">
+                                    <i class="fas fa-paper-plane"></i> Submit Feedback
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Dashboard Page -->
+                <div id="admin-dashboard" class="page-content">
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="stats-icon bg-info"><i class="fas fa-comments"></i></div>
+                                <div class="stats-content">
+                                    <h6>Total Feedback</h6>
+                                    <p class="stats-value" id="admin-total-feedback">0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="stats-icon bg-warning"><i class="fas fa-exclamation-triangle"></i></div>
+                                <div class="stats-content">
+                                    <h6>Negative Feedback</h6>
+                                    <p class="stats-value text-danger" id="admin-negative-feedback">0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="stats-icon bg-success"><i class="fas fa-star"></i></div>
+                                <div class="stats-content">
+                                    <h6>Avg Rating</h6>
+                                    <p class="stats-value" id="admin-avg-rating">0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="stats-card">
+                                <div class="stats-icon bg-danger"><i class="fas fa-user-times"></i></div>
+                                <div class="stats-content">
+                                    <h6>Instructors @ Risk</h6>
+                                    <p class="stats-value" id="instructors-at-risk">0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts Row -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Rating Distribution</h5>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="ratingChart" height="100"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="mb-0">Course Performance</h5>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="courseChart" height="100"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Search & Filter -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Search & Filter Feedback</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <input type="text" id="search-feedback" class="form-control" placeholder="Search by course or comment...">
+                                </div>
+                                <div class="col-md-3">
+                                    <select id="filter-rating" class="form-select">
+                                        <option value="">All Ratings</option>
+                                        <option value="5">5 Stars</option>
+                                        <option value="4">4 Stars</option>
+                                        <option value="3">3 Stars</option>
+                                        <option value="2">2 Stars</option>
+                                        <option value="1">1 Star</option>
+                                        <option value="negative">Negative (≤2)</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <select id="filter-course" class="form-select">
+                                        <option value="">All Courses</option>
+                                        <!-- Populated by JavaScript -->
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <button id="reset-filters" class="btn btn-secondary w-100">Reset</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Instructor Warnings -->
+                    <div id="instructor-warnings" class="mb-4">
+                        <!-- Populated by JavaScript -->
+                    </div>
+
+                    <!-- Feedback List -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">All Feedback</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="feedback-list">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Institution Summary Page -->
+                <div id="institution" class="page-content">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-primary text-white">
+                                    <h5 class="mb-0">Institution Overview</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted">Institution Name</label>
+                                        <h6 id="inst-name">-</h6>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted">Location</label>
+                                        <h6 id="inst-location">-</h6>
+                                    </div>
+                                    <hr>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <label class="form-label text-muted">Total Courses</label>
+                                            <h5 id="inst-courses">0</h5>
+                                        </div>
+                                        <div class="col-6">
+                                            <label class="form-label text-muted">Total Students</label>
+                                            <h5 id="inst-students">0</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-success text-white">
+                                    <h5 class="mb-0">Performance Metrics</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted">Overall Average Rating</label>
+                                        <div class="d-flex align-items-center">
+                                            <h4 class="mb-0" id="inst-avg-rating">0</h4>
+                                            <span class="ms-2 text-warning" id="inst-stars">
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star-half-alt"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted">Total Feedback Received</label>
+                                        <h5 id="inst-total-feedback">0</h5>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label text-muted">Negative Feedback Rate</label>
+                                        <h5><span id="inst-negative-rate">0%</span> <small class="text-danger">(<span id="inst-negative-count">0</span>)</small></h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top Courses -->
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Top Rated Courses</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="top-courses">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Courses Needing Attention -->
+                    <div class="card">
+                        <div class="card-header bg-warning">
+                            <h5 class="mb-0">Courses Needing Attention</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="low-rated-courses">
+                                <!-- Populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Instructor Dashboard Page -->
+                <div id="instructor-dashboard" class="page-content">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="stats-card">
+                                <div class="stats-icon"><i class="fas fa-bell"></i></div>
+                                <div class="stats-content">
+                                    <h6>Notifications</h6>
+                                    <p class="stats-value" id="notification-count">0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="stats-card">
+                                <div class="stats-icon"><i class="fas fa-star"></i></div>
+                                <div class="stats-content">
+                                    <h6>Avg Rating</h6>
+                                    <p class="stats-value" id="instructor-avg-rating">0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">Notifications & Feedback</h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="instructor-notifications">
+                                <p class="text-muted">No notifications yet</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feedback Comparison Page -->
+                <div id="feedback-comparison" class="page-content">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Compare All Feedback</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label">Compare From</label>
+                                    <select id="compare-from-course" class="form-select">
+                                        <option value="">Select Course</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">Compare With</label>
+                                    <select id="compare-to-course" class="form-select">
+                                        <option value="">Select Course</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button id="run-comparison" class="btn btn-primary">Run Comparison</button>
+                        </div>
+                    </div>
+
+                    <div id="comparison-results" style="display:none;">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header bg-info text-white">
+                                        <h5 class="mb-0" id="course1-name">Course 1</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <p><strong>Average Rating:</strong> <span id="course1-rating">0</span>/5</p>
+                                            <p><strong>Total Feedback:</strong> <span id="course1-count">0</span></p>
+                                            <p><strong>Negative Feedback:</strong> <span id="course1-negative">0</span></p>
+                                        </div>
+                                        <div id="course1-feedback"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="card">
+                                    <div class="card-header bg-info text-white">
+                                        <h5 class="mb-0" id="course2-name">Course 2</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <p><strong>Average Rating:</strong> <span id="course2-rating">0</span>/5</p>
+                                            <p><strong>Total Feedback:</strong> <span id="course2-count">0</span></p>
+                                            <p><strong>Negative Feedback:</strong> <span id="course2-negative">0</span></p>
+                                        </div>
+                                        <div id="course2-feedback"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card mt-4">
+                            <div class="card-header">
+                                <h5 class="mb-0">Comparison Analysis</h5>
+                            </div>
+                            <div class="card-body">
+                                <div id="comparison-analysis"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
