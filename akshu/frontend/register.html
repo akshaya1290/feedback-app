@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Feedback System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .register-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .register-box {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+            width: 100%;
+            max-width: 500px;
+            animation: slideUp 0.5s ease;
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .register-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .register-header h3 {
+            color: white;
+            margin: 0 0 10px 0;
+            font-size: 1.6rem;
+        }
+        
+        .register-header p {
+            color: rgba(255,255,255,0.9);
+            margin: 0;
+            font-size: 0.9rem;
+        }
+        
+        .register-body {
+            padding: 30px;
+        }
+        
+        .role-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .role-btn {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #666;
+        }
+        
+        .role-btn:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+        
+        .role-btn.active {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+        
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .btn-register {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            color: white;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+        
+        .register-footer {
+            text-align: center;
+            padding: 0 30px 20px 30px;
+            color: #999;
+        }
+        
+        .register-footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .register-footer a:hover {
+            text-decoration: underline;
+        }
+        
+        .role-fields {
+            display: none;
+        }
+        
+        .role-fields.active {
+            display: block;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-box">
+            <div class="register-header">
+                <h3><i class="fas fa-graduation-cap"></i> Create Account</h3>
+                <p>Join the Feedback System</p>
+            </div>
+            
+            <div class="register-body">
+                <!-- Role Selector -->
+                <div class="role-selector">
+                    <button type="button" class="role-btn active" data-role="student">
+                        <i class="fas fa-user-graduate"></i><br>Student
+                    </button>
+                    <button type="button" class="role-btn" data-role="admin">
+                        <i class="fas fa-tachometer-alt"></i><br>Admin
+                    </button>
+                    <button type="button" class="role-btn" data-role="instructor">
+                        <i class="fas fa-chalkboard-user"></i><br>Instructor
+                    </button>
+                </div>
+
+                <!-- Student Registration -->
+                <div id="student-form" class="role-fields active">
+                    <form id="student-reg-form">
+                        <div class="form-label">Full Name</div>
+                        <input type="text" class="form-control" placeholder="Enter your full name" required>
+                        
+                        <div class="form-label">Email Address</div>
+                        <input type="email" class="form-control" placeholder="Enter your email" required>
+                        
+                        <div class="form-label">Student ID</div>
+                        <input type="text" class="form-control" placeholder="Enter your student ID" required>
+                        
+                        <div class="form-label">Password</div>
+                        <input type="password" class="form-control" placeholder="Create a password" required>
+                        
+                        <div class="form-label">Confirm Password</div>
+                        <input type="password" class="form-control" placeholder="Confirm password" required>
+                        
+                        <button type="submit" class="btn-register">Register as Student</button>
+                    </form>
+                </div>
+
+                <!-- Admin Registration -->
+                <div id="admin-form" class="role-fields">
+                    <form id="admin-reg-form">
+                        <div class="form-label">Full Name</div>
+                        <input type="text" class="form-control" placeholder="Enter your full name" required>
+                        
+                        <div class="form-label">Email Address</div>
+                        <input type="email" class="form-control" placeholder="Enter your email" required>
+                        
+                        <div class="form-label">Admin ID</div>
+                        <input type="text" class="form-control" placeholder="Enter your admin ID" required>
+                        
+                        <div class="form-label">Institution</div>
+                        <input type="text" class="form-control" placeholder="Institution name" required>
+                        
+                        <div class="form-label">Username</div>
+                        <input type="text" class="form-control" placeholder="Choose a username" required>
+                        
+                        <div class="form-label">Password</div>
+                        <input type="password" class="form-control" placeholder="Create a password" required>
+                        
+                        <div class="form-label">Confirm Password</div>
+                        <input type="password" class="form-control" placeholder="Confirm password" required>
+                        
+                        <button type="submit" class="btn-register">Register as Admin</button>
+                    </form>
+                </div>
+
+                <!-- Instructor Registration -->
+                <div id="instructor-form" class="role-fields">
+                    <form id="instructor-reg-form">
+                        <div class="form-label">Full Name</div>
+                        <input type="text" class="form-control" placeholder="Enter your full name" required>
+                        
+                        <div class="form-label">Email Address</div>
+                        <input type="email" class="form-control" placeholder="Enter your email" required>
+                        
+                        <div class="form-label">Employee ID</div>
+                        <input type="text" class="form-control" placeholder="Enter your employee ID" required>
+                        
+                        <div class="form-label">Department</div>
+                        <input type="text" class="form-control" placeholder="Your department" required>
+                        
+                        <div class="form-label">Username</div>
+                        <input type="text" class="form-control" placeholder="Choose a username" required>
+                        
+                        <div class="form-label">Password</div>
+                        <input type="password" class="form-control" placeholder="Create a password" required>
+                        
+                        <div class="form-label">Confirm Password</div>
+                        <input type="password" class="form-control" placeholder="Confirm password" required>
+                        
+                        <button type="submit" class="btn-register">Register as Instructor</button>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="register-footer">
+                Already have an account? <a href="index.html">Login here</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Role selector
+        document.querySelectorAll('.role-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active from all buttons
+                document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+                // Add active to clicked button
+                btn.classList.add('active');
+                
+                // Hide all forms
+                document.querySelectorAll('.role-fields').forEach(form => form.classList.remove('active'));
+                
+                // Show selected form
+                const role = btn.getAttribute('data-role');
+                document.getElementById(role + '-form').classList.add('active');
+            });
+        });
+
+        // Form submissions
+        document.getElementById('student-reg-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const inputs = e.target.querySelectorAll('input');
+            const password = inputs[3].value;
+            const confirmPassword = inputs[4].value;
+            
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+            
+            alert('Student registration successful! Please login.');
+            window.location.href = 'index.html';
+        });
+
+        document.getElementById('admin-reg-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const inputs = e.target.querySelectorAll('input');
+            const password = inputs[5].value;
+            const confirmPassword = inputs[6].value;
+            
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+            
+            alert('Admin registration successful! Please login with your credentials.');
+            window.location.href = 'index.html';
+        });
+
+        document.getElementById('instructor-reg-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const inputs = e.target.querySelectorAll('input');
+            const password = inputs[5].value;
+            const confirmPassword = inputs[6].value;
+            
+            if (password !== confirmPassword) {
+                alert('Passwords do not match!');
+                return;
+            }
+            
+            alert('Instructor registration successful! Please login with your credentials (password: pass123).');
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>
