@@ -105,19 +105,32 @@
             text-decoration: underline;
         }
         
-        .remember-me {
+        .tab-buttons {
             display: flex;
-            align-items: center;
-            margin: 20px 0;
+            margin-bottom: 20px;
         }
         
-        .remember-me input {
-            accent-color: #11998e;
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: #f8f9fa;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
         
-        .remember-me label {
-            margin: 0 0 0 8px;
-            color: #666;
+        .tab-btn.active {
+            background: #11998e;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
         }
 
         .role-badge {
@@ -209,46 +222,77 @@
                     <i class="fas fa-user-tie"></i> Instructor Portal
                 </div>
 
-                <div class="success-message" id="success-message">
-                    <i class="fas fa-check-circle"></i> Instructor login successful! Redirecting...
+                <div class="tab-buttons">
+                    <button class="tab-btn active" onclick="showTab(event, 'login')">Login</button>
+                    <button class="tab-btn" onclick="showTab(event, 'register')">Register</button>
                 </div>
 
-                <div class="error-message" id="error-message"></div>
-
-                <form id="instructor-form">
-                    <div class="mb-3">
-                        <label class="form-label">Instructor Name / Employee ID</label>
-                        <input type="text" class="form-control" id="instructor-username" placeholder="e.g., Dr. Smith or EMP001" value="Dr. Smith" required>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label">Password</label>
-                        <input type="password" class="form-control" id="instructor-password" placeholder="Enter your password" value="pass123" required>
-                    </div>
-                    
-                    <div class="remember-me">
-                        <input type="checkbox" id="instructor-remember">
-                        <label for="instructor-remember">Remember me</label>
-                    </div>
-                    
-                    <button type="submit" class="btn btn-login w-100">
-                        <i class="fas fa-sign-in-alt"></i> Instructor Login
-                    </button>
-                </form>
-
-                <div class="demo-credentials">
-                    <strong><i class="fas fa-lightbulb"></i> Demo Credentials:</strong>
-                    Username: <code>Dr. Smith</code><br>
-                    (Or use any name)<br>
-                    Password: <code>pass123</code>
+                <!-- Login Tab -->
+                <div id="login-tab" class="tab-content active">
+                    <form method="post">
+                        {% csrf_token %}
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %}">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        <div class="mb-3">
+                            <label class="form-label">Username</label>
+                            <input type="text" name="username" class="form-control" placeholder="Enter instructor username" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            <input type="password" name="password" class="form-control" placeholder="Enter your password" required>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-login w-100">
+                            <i class="fas fa-sign-in-alt"></i> Instructor Login
+                        </button>
+                    </form>
                 </div>
 
-                <div class="info-box">
-                    <i class="fas fa-info-circle"></i> <strong>Tip:</strong> You can use any instructor name. This system will track your course performance and student feedback.
+                <!-- Register Tab -->
+                <div id="register-tab" class="tab-content">
+                    <form method="post">
+                        {% csrf_token %}
+                        {% if messages %}
+                            {% for message in messages %}
+                                <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}success{% endif %}">
+                                    {{ message }}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                        <div class="mb-3">
+                            <label class="form-label">Name</label>
+                            <input type="text" name="name" class="form-control" placeholder="Enter your full name" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" name="email" class="form-control" placeholder="Enter your email" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Username</label>
+                            <input type="text" name="username" class="form-control" placeholder="Choose a username" required>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label">Password</label>
+                            <input type="password" name="password" class="form-control" placeholder="Create a password" required>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-login w-100">
+                            <i class="fas fa-user-plus"></i> Register Instructor
+                        </button>
+                    </form>
                 </div>
 
                 <div class="back-link">
-                    <a href="index.html">← Back to Role Selection</a>
+                    <a href="/">← Back to Role Selection</a>
                 </div>
             </div>
 
@@ -259,51 +303,17 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.getElementById('instructor-form').addEventListener('submit', function(e) {
-            e.preventDefault();
+        function showTab(evt, tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             
-            const username = document.getElementById('instructor-username').value.trim();
-            const password = document.getElementById('instructor-password').value;
-            const remember = document.getElementById('instructor-remember').checked;
-
-            if (!username) {
-                document.getElementById('error-message').textContent = '❌ Please enter your name or Employee ID!';
-                document.getElementById('error-message').style.display = 'block';
-                return;
-            }
-
-            if (password !== 'pass123') {
-                document.getElementById('error-message').textContent = '❌ Invalid password!';
-                document.getElementById('error-message').style.display = 'block';
-                return;
-            }
-
-            // Store login info
-            localStorage.setItem('userRole', 'instructor');
-            localStorage.setItem('username', username);
-            localStorage.setItem('instructorName', username);
-            if (remember) {
-                localStorage.setItem('rememberMe', 'true');
-                localStorage.setItem('savedUsername', username);
-            }
-
-            // Show success message
-            document.getElementById('success-message').style.display = 'block';
-            
-            // Redirect to dashboard
-            setTimeout(() => {
-                window.location.href = 'dashboard.html';
-            }, 1500);
-        });
-
-        // Auto-fill saved username if remember me was checked
-        window.addEventListener('load', function() {
-            if (localStorage.getItem('rememberMe') === 'true') {
-                document.getElementById('instructor-username').value = localStorage.getItem('savedUsername') || 'Dr. Smith';
-                document.getElementById('instructor-remember').checked = true;
-            }
-        });
+            // Show selected tab
+            document.getElementById(tabName + '-tab').classList.add('active');
+            evt.currentTarget.classList.add('active');
+        }
     </script>
 </body>
 </html>

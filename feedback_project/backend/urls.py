@@ -6,7 +6,8 @@ from django.conf.urls.static import static
 from django.views.static import serve
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # Move Django admin to a less-conflicting path so custom portal routes can use /admin/*
+    path('django-admin/', admin.site.urls),
     path('', include('feedback.urls')),
 ]
 

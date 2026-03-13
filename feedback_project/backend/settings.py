@@ -18,6 +18,15 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 
+# Custom User Model
+AUTH_USER_MODEL = 'feedback.User'
+
+# Authentication backends
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -43,12 +52,15 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'feedback_project.urls'
+ROOT_URLCONF = 'backend.urls'
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR.parent / 'frontend'],  # Points to c:\Users\akshaya\Desktop\akshu\frontend
+        'DIRS': [
+            BASE_DIR.parent / 'frontend' / 'templates',  # Points to templates directory
+            BASE_DIR.parent / 'frontend',  # Points to frontend directory
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -61,7 +73,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'feedback_project.wsgi.application'
+WSGI_APPLICATION = 'backend.wsgi.application'
 
 
 # Database

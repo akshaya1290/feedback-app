@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instructor Dashboard - AI Course Feedback System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .welcome-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 0;
+            margin-bottom: 30px;
+        }
+        .course-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        .course-card .card-header {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+        }
+        .feedback-item {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .sentiment-badge {
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75em;
+            font-weight: 600;
+        }
+        .sentiment-positive { background: #d4edda; color: #155724; }
+        .sentiment-neutral { background: #fff3cd; color: #856404; }
+        .sentiment-negative { background: #f8d7da; color: #721c24; }
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        .section-title {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-graduation-cap me-2"></i>
+                AI Course Feedback System
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3">
+                    Welcome, {{ user.name }} (Instructor)
+                </span>
+                <a class="btn btn-outline-light btn-sm" href="{% url 'logout' %}">
+                    <i class="fas fa-sign-out-alt me-1"></i>Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Welcome Section -->
+    <div class="welcome-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h1 class="display-4 fw-bold">Instructor Dashboard</h1>
+                    <p class="lead">Monitor your courses and student feedback</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Courses Section -->
+        {% if courses %}
+        <div class="row">
+            <div class="col-12">
+                <h2 class="section-title">
+                    <i class="fas fa-book-open me-2"></i>My Courses
+                </h2>
+            </div>
+        </div>
+        <div class="row">
+            {% for course in courses %}
+            <div class="col-lg-6">
+                <div class="card course-card">
+                    <div class="card-header">
+                        <h5 class="mb-0">{{ course.course_name }}</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if course.description %}
+                        <p class="card-text">{{ course.description }}</p>
+                        {% endif %}
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <h6 class="text-muted">Enrolled</h6>
+                                <h4 class="text-primary">{{ course.enrollments.count }}</h4>
+                            </div>
+                            <div class="col-4">
+                                <h6 class="text-muted">Feedback</h6>
+                                <h4 class="text-success">{{ course.feedbacks.count }}</h4>
+                            </div>
+                            <div class="col-4">
+                                <h6 class="text-muted">Created</h6>
+                                <small class="text-muted">{{ course.created_at|date:"M d, Y" }}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Feedback Section -->
+        {% if feedback %}
+        <div class="row mt-5">
+            <div class="col-12">
+                <h2 class="section-title">
+                    <i class="fas fa-comments me-2"></i>Student Feedback
+                </h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                {% for fb in feedback %}
+                <div class="feedback-item">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div class="flex-grow-1">
+                            <h6 class="mb-1">
+                                <i class="fas fa-user-graduate me-2 text-primary"></i>{{ fb.student.name }}
+                                <small class="text-muted">in {{ fb.course.course_name }}</small>
+                            </h6>
+                            <p class="mb-2">{{ fb.feedback_text }}</p>
+                            <small class="text-muted">{{ fb.created_at|date:"M d, Y H:i" }}</small>
+                        </div>
+                        <div class="ms-3">
+                            <span class="sentiment-badge sentiment-{{ fb.sentiment }}">
+                                {{ fb.sentiment|title }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="row">
+            <div class="col-12 text-center mt-5">
+                <div class="card">
+                    <div class="card-body py-5">
+                        <i class="fas fa-info-circle fa-3x text-muted mb-3"></i>
+                        <h4>No Feedback Yet</h4>
+                        <p class="text-muted">Students haven't submitted feedback for your courses yet.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if not courses %}
+        <div class="row">
+            <div class="col-12 text-center mt-5">
+                <div class="card">
+                    <div class="card-body py-5">
+                        <i class="fas fa-info-circle fa-3x text-muted mb-3"></i>
+                        <h4>No Courses Assigned</h4>
+                        <p class="text-muted">You don't have any courses assigned yet. Please contact the administrator.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+        }
+        .stats-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-chalkboard-teacher"></i> Instructor Dashboard
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3">
+                    Welcome, {{ user.name }} ({{ user.username }})
+                </span>
+                <a class="nav-link" href="{% url 'logout' %}">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row mb-4">
+            <div class="col-md-4">
+                <div class="stats-card">
+                    <i class="fas fa-book fa-2x text-success mb-2"></i>
+                    <div class="stats-number">{{ courses|length }}</div>
+                    <div>Courses Teaching</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-card">
+                    <i class="fas fa-comments fa-2x text-primary mb-2"></i>
+                    <div class="stats-number">{{ feedback|length }}</div>
+                    <div>Total Feedback</div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stats-card">
+                    <i class="fas fa-chart-line fa-2x text-warning mb-2"></i>
+                    <div class="stats-number">
+                        {% widthratio feedback|length courses|length 1 %}%
+                    </div>
+                    <div>Avg Response Rate</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Feedback Analytics Chart -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="fas fa-chart-bar"></i> Feedback Sentiment Overview</h5>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="feedbackChart" height="100"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8">
+                {% for course in courses %}
+                <div class="card course-card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-book"></i> {{ course.course_name }}
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-muted">{{ course.description }}</p>
+
+                        <h6>Recent Feedback:</h6>
+                        {% for fb in feedback %}
+                            {% if fb.course == course %}
+                            <div class="feedback-item">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <strong>{{ fb.student.name }}</strong>
+                                        <p class="mb-1">{{ fb.feedback_text }}</p>
+                                    </div>
+                                    <span class="sentiment-badge sentiment-{{ fb.sentiment }}">
+                                        {{ fb.sentiment|title }}
+                                    </span>
+                                </div>
+                                <small class="text-muted">
+                                    {{ fb.created_at|date:"M d, Y H:i" }}
+                                </small>
+                            </div>
+                            {% endif %}
+                        {% empty %}
+                        <p class="text-muted">No feedback yet.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-chart-pie"></i> Feedback Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        {% for course in courses %}
+                        <div class="mb-3">
+                            <h6>{{ course.course_name }}</h6>
+                            {% with course_feedback=feedback|dictsort:"course" %}
+                                {% for fb in course_feedback %}
+                                    {% if fb.course == course %}
+                                        <div class="d-flex justify-content-between">
+                                            <span>{{ fb.sentiment|title }}</span>
+                                            <span class="badge bg-secondary">{{ sentiment_counts|get:fb.sentiment|default:0 }}</span>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            {% endwith %}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Feedback Chart
+        const ctx = document.getElementById('feedbackChart').getContext('2d');
+        const feedbackData = {
+            labels: ['Positive', 'Neutral', 'Negative'],
+            datasets: [{
+                label: 'Feedback Count',
+                data: [
+                    {% for fb in feedback %}
+                        {% if fb.sentiment == 'positive' %}
+                            {{ forloop.counter }}
+                        {% endif %}
+                    {% empty %}0{% endfor %},
+                    {% for fb in feedback %}
+                        {% if fb.sentiment == 'neutral' %}
+                            {{ forloop.counter }}
+                        {% endif %}
+                    {% empty %}0{% endfor %},
+                    {% for fb in feedback %}
+                        {% if fb.sentiment == 'negative' %}
+                            {{ forloop.counter }}
+                        {% endif %}
+                    {% empty %}0{% endfor %}
+                ],
+                backgroundColor: [
+                    'rgba(40, 167, 69, 0.8)',
+                    'rgba(255, 193, 7, 0.8)',
+                    'rgba(220, 53, 69, 0.8)'
+                ],
+                borderColor: [
+                    'rgba(40, 167, 69, 1)',
+                    'rgba(255, 193, 7, 1)',
+                    'rgba(220, 53, 69, 1)'
+                ],
+                borderWidth: 1
+            }]
+        };
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: feedbackData,
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

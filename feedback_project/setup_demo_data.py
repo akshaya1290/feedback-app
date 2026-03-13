@@ -9,201 +9,103 @@ import sys
 import django
 
 # Setup Django
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'feedback_project.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
 django.setup()
 
-from django.contrib.auth.models import User
-from feedback.models import Institution, Course, StudentProfile, InstructorProfile, AdminProfile
+from feedback.models import User, Course, Enrollment, Feedback
 
-def create_institution(name, location, description):
-    """Create an institution"""
-    try:
-        inst, created = Institution.objects.get_or_create(
-            name=name,
-            defaults={'location': location, 'description': description}
-        )
-        if created:
-            print(f"✓ Created Institution: {name}")
-        else:
-            print(f"✓ Institution already exists: {name}")
-        return inst
-    except Exception as e:
-        print(f"✗ Error creating institution: {e}")
-        return None
-
-def create_courses(institution, courses_list):
-    """Create courses for an institution"""
-    created_count = 0
-    for course_name, instructor, description in courses_list:
-        try:
-            course, created = Course.objects.get_or_create(
-                name=course_name,
-                instructor=instructor,
-                institution=institution,
-                defaults={'description': description}
-            )
-            if created:
-                created_count += 1
-                print(f"  ✓ Created Course: {course_name}")
-            else:
-                print(f"  ✓ Course already exists: {course_name}")
-        except Exception as e:
-            print(f"  ✗ Error creating {course_name}: {e}")
-    
-    print(f"\n✓ Created {created_count} new courses\n")
-
-def create_user(username, email, password, first_name, last_name):
-    """Create a Django user"""
+def create_user(username, email, name, password, role):
+    """Create a user"""
     try:
         user, created = User.objects.get_or_create(
             username=username,
             defaults={
                 'email': email,
-                'first_name': first_name,
-                'last_name': last_name
+                'name': name,
+                'role': role
             }
         )
         if created:
             user.set_password(password)
             user.save()
-            print(f"✓ Created User: {username}")
+            print(f"✓ Created {role}: {name}")
         else:
-            print(f"✓ User already exists: {username}")
+            print(f"✓ {role} already exists: {name}")
         return user
     except Exception as e:
-        print(f"✗ Error creating user {username}: {e}")
+        print(f"✗ Error creating user: {e}")
         return None
 
-def create_student(username, email, password, first_name, last_name, student_id, institution):
-    """Create a student user with profile"""
-    user = create_user(username, email, password, first_name, last_name)
-    if user:
-        try:
-            profile, created = StudentProfile.objects.get_or_create(
-                user=user,
-                defaults={'student_id': student_id, 'institution': institution}
-            )
-            if created:
-                print(f"  ✓ Created Student Profile: {student_id}")
-            else:
-                print(f"  ✓ Student Profile already exists: {student_id}")
-        except Exception as e:
-            print(f"  ✗ Error creating student profile: {e}")
-
-def create_instructor(username, email, password, first_name, last_name, employee_id, department, institution):
-    """Create an instructor user with profile"""
-    user = create_user(username, email, password, first_name, last_name)
-    if user:
-        try:
-            profile, created = InstructorProfile.objects.get_or_create(
-                user=user,
-                defaults={
-                    'employee_id': employee_id,
-                    'department': department,
-                    'institution': institution
-                }
-            )
-            if created:
-                print(f"  ✓ Created Instructor Profile: {employee_id}")
-            else:
-                print(f"  ✓ Instructor Profile already exists: {employee_id}")
-        except Exception as e:
-            print(f"  ✗ Error creating instructor profile: {e}")
-
-def create_admin(username, email, password, first_name, last_name, admin_id, institution):
-    """Create an admin user with profile"""
-    user = create_user(username, email, password, first_name, last_name)
-    if user:
-        user.is_staff = True
-        user.is_superuser = True
-        user.save()
-        try:
-            profile, created = AdminProfile.objects.get_or_create(
-                user=user,
-                defaults={'admin_id': admin_id, 'institution': institution}
-            )
-            if created:
-                print(f"  ✓ Created Admin Profile: {admin_id}")
-            else:
-                print(f"  ✓ Admin Profile already exists: {admin_id}")
-        except Exception as e:
-            print(f"  ✗ Error creating admin profile: {e}")
+def create_course(course_name, instructor, description=''):
+    """Create a course"""
+    try:
+        course, created = Course.objects.get_or_create(
+            course_name=course_name,
+            instructor=instructor,
+            defaults={'description': description}
+        )
+        if created:
+            print(f"✓ Created Course: {course_name}")
+        else:
+            print(f"✓ Course already exists: {course_name}")
+        return course
+    except Exception as e:
+        print(f"✗ Error creating course: {e}")
+        return None
 
 def main():
-    """Main setup function"""
-    print("\n" + "="*60)
-    print("  Student Feedback System - Quick Setup")
-    print("="*60 + "\n")
-    
-    # Create Institution
-    print("Creating Institution...")
-    institution = create_institution(
-        "ABC University",
-        "New York, USA",
-        "A premier educational institution offering quality education"
-    )
-    
-    if not institution:
-        print("✗ Failed to create institution. Exiting.")
-        sys.exit(1)
-    
-    # Create Courses
-    print("\nCreating Courses...")
-    courses_data = [
-        ("Data Science 101", "Dr. Smith", "Introduction to data science and analytics"),
-        ("Web Development", "Prof. Johnson", "Learn modern web development with HTML, CSS, and JavaScript"),
-        ("Machine Learning", "Dr. Williams", "Deep dive into machine learning algorithms and applications"),
-        ("Python Basics", "Prof. Brown", "Master Python programming fundamentals"),
-        ("Cloud Computing", "Dr. Davis", "Cloud architecture and deployment strategies"),
-        ("Database Design", "Prof. Miller", "Relational and NoSQL database design"),
-        ("Mobile App Development", "Dr. Wilson", "Build cross-platform mobile applications"),
-        ("Cybersecurity", "Prof. Moore", "Security principles and ethical hacking"),
-    ]
-    create_courses(institution, courses_data)
-    
-    # Create Students
-    print("Creating Sample Students...")
-    students_data = [
-        ("student1", "student1@example.com", "pass123", "John", "Doe", "STU001"),
-        ("student2", "student2@example.com", "pass123", "Jane", "Smith", "STU002"),
-        ("student3", "student3@example.com", "pass123", "Bob", "Johnson", "STU003"),
-    ]
-    for username, email, password, first_name, last_name, student_id in students_data:
-        create_student(username, email, password, first_name, last_name, student_id, institution)
-    
-    # Create Instructors
-    print("\nCreating Sample Instructors...")
-    instructors_data = [
-        ("instructor1", "instructor1@example.com", "pass123", "Dr.", "Smith", "EMP001", "Computer Science"),
-        ("instructor2", "instructor2@example.com", "pass123", "Prof.", "Johnson", "EMP002", "Engineering"),
-        ("instructor3", "instructor3@example.com", "pass123", "Dr.", "Williams", "EMP003", "Mathematics"),
-    ]
-    for username, email, password, first_name, last_name, emp_id, dept in instructors_data:
-        create_instructor(username, email, password, first_name, last_name, emp_id, dept, institution)
-    
-    # Create Admin
-    print("\nCreating Admin User...")
-    create_admin("admin", "admin@example.com", "admin123", "Admin", "User", "ADM001", institution)
-    
-    print("\n" + "="*60)
-    print("  ✓ Setup Complete!")
-    print("="*60)
-    print("\n📝 Login Credentials (Demo):")
-    print("  Student:    username='student1' password='pass123'")
-    print("  Instructor: username='instructor1' password='pass123'")
-    print("  Admin:      username='admin' password='admin123'")
-    print("\n🚀 Start the server with: python manage.py runserver")
-    print("📊 Access admin panel at: http://localhost:8000/admin")
-    print("\n" + "="*60 + "\n")
+    print("🚀 Setting up Student Feedback System Demo Data...")
+    print("=" * 50)
+
+    # Create admin
+    admin = create_user('admin', 'admin@example.com', 'Admin User', 'admin123', 'admin')
+
+    # Create instructors
+    instructor1 = create_user('john_doe', 'john@example.com', 'John Doe', 'pass123', 'instructor')
+    instructor2 = create_user('jane_smith', 'jane@example.com', 'Jane Smith', 'pass123', 'instructor')
+
+    # Create students
+    student1 = create_user('alice', 'alice@example.com', 'Alice Johnson', 'pass123', 'student')
+    student2 = create_user('bob', 'bob@example.com', 'Bob Wilson', 'pass123', 'student')
+    student3 = create_user('charlie', 'charlie@example.com', 'Charlie Brown', 'pass123', 'student')
+
+    # Create courses
+    course1 = create_course('Web Development', instructor1, 'Learn HTML, CSS, JavaScript')
+    course2 = create_course('Data Science', instructor2, 'Introduction to data analysis')
+    course3 = create_course('Artificial Intelligence', instructor1, 'AI fundamentals')
+    course4 = create_course('Cloud Computing', instructor2, 'AWS and cloud technologies')
+
+    # Create enrollments
+    if student1 and course1:
+        Enrollment.objects.get_or_create(student=student1, course=course1)
+        print("✓ Enrolled Alice in Web Development")
+
+    if student1 and course2:
+        Enrollment.objects.get_or_create(student=student1, course=course2)
+        print("✓ Enrolled Alice in Data Science")
+
+    if student2 and course1:
+        Enrollment.objects.get_or_create(student=student2, course=course1)
+        print("✓ Enrolled Bob in Web Development")
+
+    # Create feedback
+    if student1 and course1:
+        Feedback.objects.get_or_create(
+            student=student1,
+            course=course1,
+            defaults={
+                'feedback_text': 'Great course! Learned a lot about web development.',
+                'sentiment': 'positive'
+            }
+        )
+        print("✓ Created feedback from Alice for Web Development")
+
+    print("=" * 50)
+    print("✅ Demo data setup complete!")
+    print("\nLogin Credentials:")
+    print("Admin: username=admin, password=admin123")
+    print("Instructor: username=john_doe, password=pass123")
+    print("Student: username=alice, password=pass123")
 
 if __name__ == '__main__':
-    try:
-        main()
-    except KeyboardInterrupt:
-        print("\n\n✗ Setup cancelled by user.")
-        sys.exit(0)
-    except Exception as e:
-        print(f"\n✗ Setup failed with error: {e}")
-        import traceback
-        traceback.print_exc()
-        sys.exit(1)
+    main()

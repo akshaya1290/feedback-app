@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - AI Course Feedback System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .welcome-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 0;
+            margin-bottom: 30px;
+        }
+        .stats-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .stats-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        .stats-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .stats-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+        .stats-students .stats-icon { color: #28a745; }
+        .stats-instructors .stats-icon { color: #007bff; }
+        .stats-courses .stats-icon { color: #ffc107; }
+        .stats-feedback .stats-icon { color: #dc3545; }
+        .chart-container {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .btn-admin {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 25px;
+            padding: 10px 20px;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+        .btn-admin:hover {
+            transform: scale(1.05);
+        }
+        .recent-feedback {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .section-title {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-graduation-cap me-2"></i>
+                AI Course Feedback System
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="btn btn-outline-light btn-sm me-2" href="{% url 'manage_courses' %}">
+                    <i class="fas fa-book me-1"></i>Manage Courses
+                </a>
+                <a class="btn btn-outline-light btn-sm me-2" href="{% url 'manage_users' %}">
+                    <i class="fas fa-users me-1"></i>Manage Users
+                </a>
+                <span class="navbar-text me-3">
+                    Welcome, {{ user.name }} (Admin)
+                </span>
+                <a class="btn btn-outline-light btn-sm" href="{% url 'logout' %}">
+                    <i class="fas fa-sign-out-alt me-1"></i>Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Welcome Section -->
+    <div class="welcome-section">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h1 class="display-4 fw-bold">Admin Dashboard</h1>
+                    <p class="lead">Manage the system, monitor analytics, and oversee operations</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Statistics Cards -->
+        <div class="row mb-4">
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stats-card stats-students">
+                    <div class="stats-icon">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <div class="stats-number">{{ total_students }}</div>
+                    <div class="stats-label">Total Students</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stats-card stats-instructors">
+                    <div class="stats-icon">
+                        <i class="fas fa-user-tie"></i>
+                    </div>
+                    <div class="stats-number">{{ total_instructors }}</div>
+                    <div class="stats-label">Total Instructors</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stats-card stats-courses">
+                    <div class="stats-icon">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <div class="stats-number">{{ total_courses }}</div>
+                    <div class="stats-label">Total Courses</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6 mb-4">
+                <div class="stats-card stats-feedback">
+                    <div class="stats-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div class="stats-number">{{ total_feedback }}</div>
+                    <div class="stats-label">Total Feedback</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="row mb-4">
+            <div class="col-lg-6">
+                <div class="chart-container">
+                    <h5 class="text-center mb-4">Feedback Sentiment Distribution</h5>
+                    <canvas id="sentimentChart"></canvas>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="recent-feedback">
+                    <h5 class="text-center mb-4">Recent Feedback</h5>
+                    <div class="list-group list-group-flush">
+                        {% for fb in recent_feedback %}
+                        <div class="list-group-item px-0">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ fb.student.name }} <small class="text-muted">in {{ fb.course.course_name }}</small></h6>
+                                <small class="text-muted">{{ fb.created_at|date:"M d" }}</small>
+                            </div>
+                            <p class="mb-1">{{ fb.feedback_text|truncatechars:60 }}</p>
+                            <small class="badge bg-{% if fb.sentiment == 'positive' %}success{% elif fb.sentiment == 'neutral' %}secondary{% else %}danger{% endif %}">
+                                {{ fb.sentiment|title }}
+                            </small>
+                        </div>
+                        {% endfor %}
+                        {% if not recent_feedback %}
+                        <div class="text-center py-4">
+                            <i class="fas fa-info-circle fa-2x text-muted mb-2"></i>
+                            <p class="text-muted">No feedback submitted yet</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Management Actions -->
+        <div class="row">
+            <div class="col-12">
+                <h2 class="section-title">Management Actions</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-4 mb-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-book fa-3x text-primary mb-3"></i>
+                        <h5 class="card-title">Course Management</h5>
+                        <p class="card-text">Add, edit, and manage courses and their instructors</p>
+                        <a href="{% url 'manage_courses' %}" class="btn btn-admin">Manage Courses</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-users fa-3x text-success mb-3"></i>
+                        <h5 class="card-title">User Management</h5>
+                        <p class="card-text">View and manage all users in the system</p>
+                        <a href="{% url 'manage_users' %}" class="btn btn-admin">Manage Users</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <i class="fas fa-chart-bar fa-3x text-info mb-3"></i>
+                        <h5 class="card-title">Analytics</h5>
+                        <p class="card-text">View detailed analytics and reports</p>
+                        <button class="btn btn-admin" disabled>Coming Soon</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sentiment Chart
+        const sentimentData = {
+            labels: ['Positive', 'Neutral', 'Negative'],
+            datasets: [{
+                data: [
+                    {% for stat in sentiment_stats %}
+                        {{ stat.count }}{% if not forloop.last %},{% endif %}
+                    {% endfor %}
+                ],
+                backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
+                borderWidth: 1
+            }]
+        };
+
+        const ctx = document.getElementById('sentimentChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: sentimentData,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+            border-radius: 10px;
+            padding: 10px 20px;
+            color: white;
+            transition: transform 0.2s;
+        }
+        .btn-admin:hover {
+            transform: scale(1.05);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="#">
+                <i class="fas fa-cog"></i> Admin Dashboard
+            </a>
+            <div class="navbar-nav ms-auto">
+                <span class="navbar-text me-3">
+                    Welcome, {{ user.name }} ({{ user.username }})
+                </span>
+                <a class="nav-link" href="{% url 'logout' %}">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="stats-card stats-students">
+                    <div class="stats-icon">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <div class="stats-number">{{ total_students }}</div>
+                    <div>Total Students</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card stats-instructors">
+                    <div class="stats-icon">
+                        <i class="fas fa-chalkboard-teacher"></i>
+                    </div>
+                    <div class="stats-number">{{ total_instructors }}</div>
+                    <div>Total Instructors</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card stats-courses">
+                    <div class="stats-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="stats-number">{{ total_courses }}</div>
+                    <div>Total Courses</div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card stats-feedback">
+                    <div class="stats-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <div class="stats-number">{{ total_feedback }}</div>
+                    <div>Total Feedback</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="chart-container">
+                    <h5><i class="fas fa-chart-bar"></i> Feedback Sentiment Analysis</h5>
+                    <canvas id="sentimentChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="chart-container">
+                    <h5><i class="fas fa-cogs"></i> Quick Actions</h5>
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'manage_courses' %}" class="btn btn-admin">
+                            <i class="fas fa-book"></i> Manage Courses
+                        </a>
+                        <a href="{% url 'manage_users' %}" class="btn btn-admin">
+                            <i class="fas fa-users"></i> Manage Users
+                        </a>
+                        <a href="/admin/" class="btn btn-admin" target="_blank">
+                            <i class="fas fa-database"></i> Django Admin
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sentiment Chart
+        const ctx = document.getElementById('sentimentChart').getContext('2d');
+        const sentimentData = {
+            labels: ['Positive', 'Neutral', 'Negative'],
+            datasets: [{
+                label: 'Feedback Count',
+                data: [
+                    {% for stat in sentiment_stats %}
+                        {% if stat.sentiment == 'positive' %}{{ stat.count }}{% endif %}
+                    {% empty %}0{% endfor %},
+                    {% for stat in sentiment_stats %}
+                        {% if stat.sentiment == 'neutral' %}{{ stat.count }}{% endif %}
+                    {% empty %}0{% endfor %},
+                    {% for stat in sentiment_stats %}
+                        {% if stat.sentiment == 'negative' %}{{ stat.count }}{% endif %}
+                    {% empty %}0{% endfor %}
+                ],
+                backgroundColor: [
+                    'rgba(40, 167, 69, 0.8)',
+                    'rgba(255, 193, 7, 0.8)',
+                    'rgba(220, 53, 69, 0.8)'
+                ],
+                borderColor: [
+                    'rgba(40, 167, 69, 1)',
+                    'rgba(255, 193, 7, 1)',
+                    'rgba(220, 53, 69, 1)'
+                ],
+                borderWidth: 1
+            }]
+        };
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: sentimentData,
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

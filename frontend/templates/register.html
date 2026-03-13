@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration - AI Course Feedback System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .register-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+        }
+        .register-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .register-header h2 {
+            color: #333;
+            font-weight: 600;
+        }
+        .btn-register {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 25px;
+            padding: 12px 30px;
+            font-weight: 600;
+            width: 100%;
+        }
+        .btn-register:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="register-container">
+                    <div class="register-header">
+                        <h2>Student Registration</h2>
+                        <p class="text-muted">Create your account</p>
+                    </div>
+
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="{{ form.name.id_for_label }}" class="form-label">Full Name</label>
+                            {{ form.name }}
+                            {% if form.name.errors %}
+                                <div class="text-danger small">{{ form.name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.email.id_for_label }}" class="form-label">Email Address</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="text-danger small">{{ form.email.errors.0 }}</div>
+                            {% endif %}
+                            <div class="form-text">Username will be auto-generated from email prefix</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.password.id_for_label }}" class="form-label">Password</label>
+                            {{ form.password }}
+                            {% if form.password.errors %}
+                                <div class="text-danger small">{{ form.password.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.confirm_password.id_for_label }}" class="form-label">Confirm Password</label>
+                            {{ form.confirm_password }}
+                            {% if form.confirm_password.errors %}
+                                <div class="text-danger small">{{ form.confirm_password.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <button type="submit" class="btn btn-primary btn-register">Register</button>
+                    </form>
+
+                    <div class="login-link">
+                        <p>Already have an account? <a href="{% url 'login' %}">Sign In</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+            transition: transform 0.2s;
+        }
+        .btn-register:hover {
+            transform: translateY(-2px);
+            color: white;
+        }
+        .login-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        .login-link a:hover {
+            text-decoration: underline;
+        }
+        .username-preview {
+            font-size: 0.9em;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-header">
+            <h2><i class="fas fa-user-plus"></i> Student Registration</h2>
+            <p class="text-muted">Create your account</p>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" action="{% url 'register' %}" id="registerForm">
+            {% csrf_token %}
+            <!-- allow up to three registrations simultaneously -->
+            {% for i in "123" %}
+            <div class="user-block mb-4">
+                <h5>User {{ forloop.counter }}</h5>
+                <div class="mb-3">
+                    <label for="name{{ forloop.counter }}" class="form-label">Full Name</label>
+                    <input type="text" class="form-control" id="name{{ forloop.counter }}" name="name{{ forloop.counter }}" {% if forloop.first %}required{% endif %}>
+                </div>
+                <div class="mb-3">
+                    <label for="email{{ forloop.counter }}" class="form-label">Email Address</label>
+                    <input type="email" class="form-control email-field" id="email{{ forloop.counter }}" name="email{{ forloop.counter }}" {% if forloop.first %}required{% endif %}>
+                    <div id="usernamePreview{{ forloop.counter }}" class="username-preview"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="password{{ forloop.counter }}" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password{{ forloop.counter }}" name="password{{ forloop.counter }}" {% if forloop.first %}required{% endif %}>
+                </div>
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-register">
+                <i class="fas fa-user-plus"></i> Register Users
+            </button>
+        </form>
+
+        <div class="login-link">
+            <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // update username preview for each email field
+        document.querySelectorAll('.email-field').forEach(function(elem, idx) {
+            elem.addEventListener('input', function() {
+                const email = this.value;
+                const username = email.split('@')[0];
+                const preview = document.getElementById(`usernamePreview${idx+1}`);
+                if (preview) {
+                    preview.textContent = username ? `Username will be: ${username}` : '';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
